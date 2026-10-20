@@ -74,7 +74,6 @@ function isJwtExpired(jwt: string): boolean {
   try {
     const payload = JSON.parse(atob(jwt.split('.')[1]));
     const exp = typeof payload.exp === 'number' ? payload.exp : 0;
-    // буфер 30 секунд — чтобы не ловить гонку
     return Date.now() >= exp * 1000 - 30_000;
   } catch {
     return true;
