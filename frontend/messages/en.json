@@ -1,0 +1,71 @@
+{
+  "common": {
+    "appName": "ZAMAN",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search"
+  },
+  "nav": {
+    "masters": "Masters",
+    "courses": "Courses",
+    "login": "Sign in",
+    "register": "Sign up",
+    "logout": "Sign out",
+    "profile": "Profile",
+    "studio": "Studio",
+    "dashboard": "Dashboard"
+  },
+  "home": {
+    "title": "Book consultations and courses",
+    "subtitle": "Find a specialist or enroll in a course",
+    "findMaster": "Find a master",
+    "browseCourses": "Browse courses",
+    "features": {
+      "specialists": "Specialists and coaches",
+      "specialistsDesc": "Find a specialist and book in a minute",
+      "courses": "Online courses",
+      "coursesDesc": "Buy courses and learn at your own pace",
+      "forMasters": "For masters",
+      "forMastersDesc": "Manage your schedule and sell courses"
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "role": "Who are you?",
+    "roleClient": "Client",
+    "roleClientDesc": "Book consultations",
+    "roleMaster": "Master",
+    "roleMasterDesc": "Take bookings and teach courses",
+    "loginButton": "Sign in",
+    "registerButton": "Create account",
+    "loginLink": "Already have an account?",
+    "registerLink": "Don't have an account?"
+  },
+  "masters": {
+    "title": "Masters",
+    "searchPlaceholder": "Search by name or specialization",
+    "noResults": "No masters found",
+    "bookNow": "Book now",
+    "experience": "{years} years of experience",
+    "reviews": "{count, plural, =0 {no reviews} =1 {1 review} other {# reviews}}",
+    "from": "from {price}"
+  },
+  "errors": {
+    "emailTaken": "Email already taken",
+    "invalidCredentials": "Invalid email or password",
+    "weakPassword": "Password too weak",
+    "pwnedPassword": "This password was exposed in a data breach, choose another",
+    "unauthorized": "Please sign in",
+    "forbidden": "Access denied",
+    "notFound": "Page not found"
+  }
+}

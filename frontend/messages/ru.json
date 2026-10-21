@@ -1,0 +1,71 @@
+{
+  "common": {
+    "appName": "ZAMAN",
+    "loading": "Загрузка…",
+    "error": "Что-то пошло не так",
+    "retry": "Попробовать снова",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "back": "Назад",
+    "next": "Далее",
+    "search": "Найти"
+  },
+  "nav": {
+    "masters": "Мастера",
+    "courses": "Курсы",
+    "login": "Войти",
+    "register": "Регистрация",
+    "logout": "Выйти",
+    "profile": "Профиль",
+    "studio": "Studio",
+    "dashboard": "Кабинет"
+  },
+  "home": {
+    "title": "Запись на консультации и курсы",
+    "subtitle": "Найдите специалиста или запишитесь на курс",
+    "findMaster": "Найти мастера",
+    "browseCourses": "Курсы",
+    "features": {
+      "specialists": "Психологи и коучи",
+      "specialistsDesc": "Найдите специалиста и запишитесь за минуту",
+      "courses": "Онлайн-курсы",
+      "coursesDesc": "Покупайте курсы и учитесь в своём темпе",
+      "forMasters": "Для мастеров",
+      "forMastersDesc": "Управляйте расписанием и продавайте курсы"
+    }
+  },
+  "auth": {
+    "loginTitle": "Вход",
+    "registerTitle": "Регистрация",
+    "email": "Email",
+    "password": "Пароль",
+    "name": "Имя",
+    "role": "Кто вы?",
+    "roleClient": "Клиент",
+    "roleClientDesc": "Записываться на консультации",
+    "roleMaster": "Мастер",
+    "roleMasterDesc": "Принимать записи и вести курсы",
+    "loginButton": "Войти",
+    "registerButton": "Создать аккаунт",
+    "loginLink": "Уже есть аккаунт?",
+    "registerLink": "Нет аккаунта?"
+  },
+  "masters": {
+    "title": "Мастера",
+    "searchPlaceholder": "Поиск по имени или специализации",
+    "noResults": "Мастера не найдены",
+    "bookNow": "Записаться",
+    "experience": "Опыт {years} лет",
+    "reviews": "{count, plural, =0 {нет отзывов} =1 {1 отзыв} few {# отзыва} other {# отзывов}}",
+    "from": "от {price}"
+  },
+  "errors": {
+    "emailTaken": "Email уже занят",
+    "invalidCredentials": "Неверный email или пароль",
+    "weakPassword": "Слишком простой пароль",
+    "pwnedPassword": "Этот пароль есть в утечках, выберите другой",
+    "unauthorized": "Войдите, чтобы продолжить",
+    "forbidden": "Доступ запрещён",
+    "notFound": "Страница не найдена"
+  }
+}

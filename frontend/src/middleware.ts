@@ -1,75 +1,111 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import createIntlMiddleware from 'next-intl/middleware';
+import { locales, defaultLocale, isValidLocale } from '@/i18n/config';
 import {
   ACCESS_COOKIE,
   REFRESH_COOKIE,
-  PUBLIC_PATHS,
   LOGIN_PATH,
   FORBIDDEN_PATH,
 } from '@/lib/auth-config';
 
-const REFRESH_PATH = '/api/auth/refresh';
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'always',
+  localeDetection: true,
+});
+
+const PUBLIC_PATHS = ['/', '/masters', '/courses', '/login', '/register', '/forbidden'];
+
+function stripLocale(pathname: string): { path: string; locale: string | null } {
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts.length > 0 && isValidLocale(parts[0])) {
+    return {
+      locale: parts[0],
+      path: '/' + parts.slice(1).join('/'),
+    };
+  }
+  return { locale: null, path: pathname };
+}
 
 export function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
-  if (pathname.startsWith('/api/auth/')) {
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/_vercel/') ||
+    pathname.includes('.')
+  ) {
     return NextResponse.next();
   }
+
+  const intlResponse = intlMiddleware(req);
+  if (intlResponse.status >= 300 && intlResponse.status < 400) {
+    return intlResponse;
+  }
+
+  const { path, locale } = stripLocale(pathname);
+  const effectiveLocale = locale ?? defaultLocale;
+
+  const isPublic = PUBLIC_PATHS.some(
+    (p) => path === p || path.startsWith(`${p}/`),
+  );
 
   const accessToken = req.cookies.get(ACCESS_COOKIE)?.value;
   const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value;
 
-  const isPublic = PUBLIC_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`),
-  );
-
   if (isPublic) {
-    if (
-      (pathname === LOGIN_PATH || pathname === '/register') &&
-      accessToken &&
-      !isJwtExpired(accessToken)
-    ) {
+    if ((path === '/login' || path === '/register') && accessToken && !isJwtExpired(accessToken)) {
       const roles = readRoles(accessToken);
       const home = roles.includes('ROLE_ADMIN') || roles.includes('ROLE_MASTER')
         ? '/studio'
         : '/app';
-      return NextResponse.redirect(new URL(home, req.url));
+      return NextResponse.redirect(new URL(`/${effectiveLocale}${home}`, req.url));
     }
-    return NextResponse.next();
+    return intlResponse;
   }
 
   if (!accessToken) {
     if (!refreshToken) {
-      return redirectToLogin(req, pathname + search);
+      return NextResponse.redirect(
+        new URL(`/${effectiveLocale}${LOGIN_PATH}?returnTo=${encodeURIComponent(path)}`, req.url),
+      );
     }
-    return redirectToRefresh(req, pathname + search);
+    return NextResponse.redirect(
+      new URL(`/api/auth/refresh?next=${encodeURIComponent(`/${effectiveLocale}${path}`)}`, req.url),
+    );
   }
 
   if (isJwtExpired(accessToken)) {
     if (refreshToken) {
-      return redirectToRefresh(req, pathname + search);
+      return NextResponse.redirect(
+        new URL(`/api/auth/refresh?next=${encodeURIComponent(`/${effectiveLocale}${path}`)}`, req.url),
+      );
     }
-    return redirectToLogin(req, pathname + search);
+    return NextResponse.redirect(
+      new URL(`/${effectiveLocale}${LOGIN_PATH}?returnTo=${encodeURIComponent(path)}`, req.url),
+    );
   }
 
-  if (pathname.startsWith('/admin')) {
+  if (path.startsWith('/admin')) {
     const roles = readRoles(accessToken);
     if (!roles.includes('ROLE_ADMIN')) {
-      return NextResponse.redirect(new URL(FORBIDDEN_PATH, req.url));
+      return NextResponse.redirect(new URL(`/${effectiveLocale}${FORBIDDEN_PATH}`, req.url));
     }
   }
-  if (pathname.startsWith('/studio')) {
+  if (path.startsWith('/studio')) {
     const roles = readRoles(accessToken);
     if (!roles.includes('ROLE_ADMIN') && !roles.includes('ROLE_MASTER')) {
-      return NextResponse.redirect(new URL(FORBIDDEN_PATH, req.url));
+      return NextResponse.redirect(new URL(`/${effectiveLocale}${FORBIDDEN_PATH}`, req.url));
     }
   }
 
-  return NextResponse.next();
+  return intlResponse;
 }
 
-// ─── helpers ────────────────────────────────────────
+// helpers
 function isJwtExpired(jwt: string): boolean {
   try {
     const payload = JSON.parse(atob(jwt.split('.')[1]));
@@ -86,34 +122,14 @@ function readRoles(jwt: string): string[] {
     const roles = payload.roles;
     if (!Array.isArray(roles)) return [];
     const map: Record<number, string> = {
-      1: 'ROLE_ADMIN',
-      2: 'ROLE_MASTER',
-      3: 'ROLE_CLIENT',
+      1: 'ROLE_ADMIN', 2: 'ROLE_MASTER', 3: 'ROLE_CLIENT',
     };
-    return roles
-      .map((r) => (typeof r === 'number' ? map[r] : r))
-      .filter(Boolean);
+    return roles.map((r) => (typeof r === 'number' ? map[r] : r)).filter(Boolean);
   } catch {
     return [];
   }
 }
 
-function redirectToLogin(req: NextRequest, returnTo: string) {
-  const url = req.nextUrl.clone();
-  url.pathname = LOGIN_PATH;
-  url.search = '';
-  url.searchParams.set('returnTo', returnTo);
-  return NextResponse.redirect(url);
-}
-
-function redirectToRefresh(req: NextRequest, returnTo: string) {
-  const url = req.nextUrl.clone();
-  url.pathname = REFRESH_PATH;
-  url.search = '';
-  url.searchParams.set('next', returnTo);
-  return NextResponse.redirect(url);
-}
-
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'],
 };
